@@ -6,7 +6,6 @@ import {
   TextInputSelectionChangeEventData,
   View,
 } from "react-native";
-import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
 import { MentionInputProps, MentionPartType, Suggestion } from "../types";
 import {
@@ -29,6 +28,8 @@ const MentionInput: FC<MentionInputProps> = ({
   containerStyle,
 
   onSelectionChange,
+
+  inputComponent = null,
 
   ...textInputProps
 }) => {
@@ -130,6 +131,54 @@ const MentionInput: FC<MentionInputProps> = ({
     </React.Fragment>
   );
 
+  if (inputComponent) {
+    return (
+      <View style={containerStyle}>
+        {(
+          partTypes.filter(
+            (one) =>
+              isMentionPartType(one) &&
+              one.renderSuggestions != null &&
+              !one.isBottomMentionSuggestionsRender
+          ) as MentionPartType[]
+        ).map(renderMentionSuggestions)}
+
+        {React.createElement(
+          inputComponent,
+          {
+            multiline: true,
+            ...textInputProps,
+            ref: handleTextInputRef,
+            onChangeText: onChangeInput,
+            onSelectionChange: handleSelectionChange,
+          },
+          <Text>
+            {parts.map(({ text, partType, data }, index) =>
+              partType ? (
+                <Text
+                  key={`${index}-${data?.trigger ?? "pattern"}`}
+                  style={partType.textStyle ?? defaultMentionTextStyle}
+                >
+                  {text}
+                </Text>
+              ) : (
+                <Text key={index}>{text}</Text>
+              )
+            )}
+          </Text>
+        )}
+        {(
+          partTypes.filter(
+            (one) =>
+              isMentionPartType(one) &&
+              one.renderSuggestions != null &&
+              one.isBottomMentionSuggestionsRender
+          ) as MentionPartType[]
+        ).map(renderMentionSuggestions)}
+      </View>
+    );
+  }
+
   return (
     <View style={containerStyle}>
       {(
@@ -141,7 +190,7 @@ const MentionInput: FC<MentionInputProps> = ({
         ) as MentionPartType[]
       ).map(renderMentionSuggestions)}
 
-      <BottomSheetTextInput
+      <TextInput
         multiline
         {...textInputProps}
         ref={handleTextInputRef}
@@ -162,7 +211,7 @@ const MentionInput: FC<MentionInputProps> = ({
             )
           )}
         </Text>
-      </BottomSheetTextInput>
+      </TextInput>
 
       {(
         partTypes.filter(
