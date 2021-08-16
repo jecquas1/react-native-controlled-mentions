@@ -39,6 +39,7 @@
     "react-native": ">=0.57"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^3.6.6",
     "diff": "5.0.0",
     "string.prototype.matchall": "4.0.3"
   },
